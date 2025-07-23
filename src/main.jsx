@@ -3,7 +3,7 @@ import './utils/interceptErrors.js';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import GlobalStyles from './components/GlobalStyles.jsx';
-import App from './components/Viewport.jsx';
+import App from './components/App.jsx';
 
 // =====================================================================================================================
 //  P U B L I C

@@ -125,7 +125,7 @@ const createBundle = async (target, outputDir, isDev) => {
         minify: !isDev,
         sourcemap: isDev,
         outdir: outputDir,
-        loader: {'.jpg': 'file', '.png': 'file', '.woff': 'file', '.woff2': 'file'},
+        loader: {'.jpg': 'file', '.png': 'file', '.woff': 'file', '.woff2': 'file', '.xlsx': 'file'},
         assetNames: 'assets/[name]-[hash]',
         legalComments: 'none',
         jsx: 'automatic', // this option, along with the next one, avoids the jsx emotion pragma
