@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@emotion/react": "^11.14.0",
+        "js-levenshtein": "^1.1.6",
         "open": "^10.2.0",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",

@@ -12,20 +12,19 @@ import {Global, ThemeProvider} from '@emotion/react';
 const THEME = {};
 const GLOBAL = [
     {
-        '*': {
-            boxSizing: 'border-box',
-            userSelect: 'none',
-            WebkitTapHighlightColor: 'transparent',
-            WebkitTouchCallout: 'none',
-        },
         html: {
-            lineHeight: 1,
-            textSizeAdjust: '100%',
+            fontFamily: 'monospace',
         },
-        '#root': {
-            position: 'fixed',
-            inset: 0,
+        table: {
+            borderCollapse: 'collapse',
         },
+        td: {
+            border: 'solid 1px #000',
+        },
+        th: {
+            border: 'solid 1px #000',
+            userSelect: 'none',
+        }
     },
 ];
 

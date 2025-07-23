@@ -1,4 +1,3 @@
-import './utils/interceptConsole.js';
 import './utils/interceptErrors.js';
 import React from 'react';
 import ReactDOM from 'react-dom/client';

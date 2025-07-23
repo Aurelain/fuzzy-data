@@ -1,5 +1,4 @@
 /node_modules/
 /.idea/
-/src/samples
-/docs/sample*
+*.xlsx*
 target.txt
