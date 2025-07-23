@@ -25,7 +25,7 @@ class App extends React.PureComponent {
     componentDidMount() {
         window.addEventListener('dragover', (event) => event.preventDefault());
         window.addEventListener('drop', this.onWindowDrop);
-        if (1) {
+        if (0) {
             this.onWindowDrop({
                 preventDefault: ()=>0,
                 dataTransfer: {

@@ -1,5 +1,5 @@
 /node_modules/
 /.idea/
-/docs/
 /src/samples
+/docs/sample*
 target.txt

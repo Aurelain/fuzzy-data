@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Fuzzy Data</title>
+        <style>
+            #loading {
+                position: fixed;
+                inset: 0;
+                z-index: 9999999;
+            }
+
+            #spinner {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                margin: -12px 0 0 -12px;
+                width: 24px;
+                height: 24px;
+                animation: animationSpinner infinite linear 0.75s;
+                border-radius: 100%;
+                border: 2px solid #fff;
+                border-top-color: transparent;
+                box-sizing: border-box;
+            }
+
+            @keyframes animationSpinner {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="loading">
+            <div id="spinner"></div>
+        </div>
+        <div id="root"></div>
+        <script src="main-aiMXSTpB.js" defer></script>
+    </body>
+</html>
