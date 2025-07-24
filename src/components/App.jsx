@@ -20,6 +20,7 @@ class App extends React.PureComponent {
         const {matrix} = this.state;
         return (
             <div>
+                <button onClick={this.onDownloadClick}>Download</button>
                 <textarea
                     ref={this.textareaRef}
                     onChange={this.onTextAreaChange}
@@ -118,14 +119,19 @@ class App extends React.PureComponent {
                 assume(result, 'A file could not be recognized!');
                 byType[result.type] = result.matrix;
             }
-            this.setState({
-                matrix: computeFinalMatrix(byType.c, byType.i, replacements)
-            });
+            const matrix = computeFinalMatrix(byType.c, byType.i, replacements);
+            this.setState({matrix});
         } catch (error) {
             console.error(error);
             alert(error.message);
         }
     };
+
+    onDownloadClick = () => {
+        const {matrix} = this.state;
+        const preparedMatrix = prepareMatrixForDownload(matrix);
+        downloadMatrixAsXLSX(preparedMatrix);
+    }
 
 
 }
@@ -203,6 +209,52 @@ const buildMatrix = (sheet) => {
     }
     return matrix;
 };
+
+
+/**
+ *
+ */
+const prepareMatrixForDownload = (matrix) => {
+    const fresh = JSON.parse(JSON.stringify(matrix));
+    for (const row of fresh) {
+        const {length} = row;
+        let value = row[length - 1];
+        if (typeof value === 'string' && value.startsWith('<')) {
+            value = value.replace(/<.?div>/g, '');
+            value = value.replace(/<br.?>/g, '\n');
+            value = value.replace(/•/g, '');
+            row[length - 1] = value;
+        }
+    }
+    return fresh;
+}
+
+
+/**
+ *
+ */
+const downloadMatrixAsXLSX = (matrix, filename = 'result.xlsx') => {
+    // Step 1: Convert the 2D array to a worksheet
+    const worksheet = XLSX.utils.aoa_to_sheet(matrix);
+
+    // Step 2: Create a new workbook and append the worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // Step 3: Write the workbook to binary string
+    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    // Step 4: Trigger download in browser
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
 
 
 // =====================================================================================================================

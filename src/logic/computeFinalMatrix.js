@@ -39,7 +39,7 @@ const computeFinalMatrix = (cMatrix, iMatrix, replacements) => {
         const iClean = cleanName(iName, replacements);
         const validCRows = findCRowsWithSameCorpAndMan(cMatrix, iCor, iMan, replacements);
         if (!validCRows.length) {
-            iMatrix[i][DISTANCE] = '100';
+            iMatrix[i][DISTANCE] = 100;
             iMatrix[i][COMMENT] = 'Source?';
             unknownSource++;
             continue;
