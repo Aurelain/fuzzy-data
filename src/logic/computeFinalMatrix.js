@@ -56,7 +56,7 @@ const computeFinalMatrix = (cMatrix, iMatrix, replacements) => {
         if (isDupe) {
             iMatrix[i][COMMENT] = 'Dupe!';
         }
-        if (distance < 4) {
+        if (distance < 1) {
             found++;
         } else {
             iMatrix[i][CANDIDATES] = printCandidates(candidates);
