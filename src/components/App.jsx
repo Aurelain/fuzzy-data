@@ -4,8 +4,10 @@ import sampleC from '../samples/sample-c.xlsx';
 import sampleI from '../samples/sample-i.xlsx';
 import computeFinalMatrix from '../logic/computeFinalMatrix.js';
 import assume from '../utils/assume.js';
+import testReplacements from '../logic/testReplacements.js';
 
 let xlsxFiles = [];
+let cache;
 
 // =====================================================================================================================
 //  C O M P O N E N T
@@ -35,6 +37,8 @@ class App extends React.PureComponent {
                     <>
                         <div dangerouslySetInnerHTML={{__html: summary}} />
                         <button onClick={this.onDownloadClick}>Download</button>
+                        <button onClick={this.onRunClick}>Run</button>
+                        <button onClick={this.onTestClick}>Test</button>
                     </>
                 }
 
@@ -111,22 +115,24 @@ class App extends React.PureComponent {
     };
 
     parseXlsx = async () => {
-        console.log('___________');
         this.setState({
             matrix: []
         });
         try {
-            assume(xlsxFiles.length === 2, 'Please drop exactly 2 files!');
-            const replacements = parseReplacements(this.textareaRef.current.value);
-            const byType = {};
-            for (const file of xlsxFiles) {
-                const data = await getArrayBuffer(file);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const result = analyzeWorkbook(workbook);
-                assume(result, 'A file could not be recognized!');
-                byType[result.type] = result.matrix;
+            if (!cache) {
+                assume(xlsxFiles.length === 2, 'Please drop exactly 2 files!');
+                const replacements = parseReplacements(this.textareaRef.current.value);
+                const byType = {};
+                for (const file of xlsxFiles) {
+                    const data = await getArrayBuffer(file);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const result = analyzeWorkbook(workbook);
+                    assume(result, 'A file could not be recognized!');
+                    byType[result.type] = result.matrix;
+                }
+                cache = {c:byType.c, i:byType.i, replacements};
             }
-            const {matrix, summary} = computeFinalMatrix(byType.c, byType.i, replacements);
+            const {matrix, summary} = computeFinalMatrix(cache.c, cache.i, cache.replacements);
             this.setState({matrix, summary});
         } catch (error) {
             console.error(error);
@@ -138,6 +144,15 @@ class App extends React.PureComponent {
         const {matrix} = this.state;
         const preparedMatrix = prepareMatrixForDownload(matrix);
         downloadMatrixAsXLSX(preparedMatrix);
+    };
+
+    onRunClick = () => {
+        this.parseXlsx();
+    };
+
+    onTestClick = () => {
+        const {matrix, summary} = testReplacements(cache.c, cache.i, cache.replacements);
+        this.setState({matrix, summary});
     };
 
 
