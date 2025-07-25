@@ -13,14 +13,14 @@ let xlsxFiles = [];
 class App extends React.PureComponent {
     textareaRef = React.createRef();
     state = {
-        matrix: null
+        matrix: null,
+        summary: ''
     };
 
     render() {
-        const {matrix} = this.state;
+        const {matrix, summary} = this.state;
         return (
             <div>
-                <button onClick={this.onDownloadClick}>Download</button>
                 <textarea
                     ref={this.textareaRef}
                     onChange={this.onTextAreaChange}
@@ -31,6 +31,13 @@ class App extends React.PureComponent {
                     autoCapitalize='off'
                     spellCheck='false'
                 />
+                {summary &&
+                    <>
+                        <div dangerouslySetInnerHTML={{__html: summary}} />
+                        <button onClick={this.onDownloadClick}>Download</button>
+                    </>
+                }
+
                 {matrix && !!matrix.length && this.renderMatrix(matrix)}
                 {matrix && !matrix.length && 'Loading...'}
                 {!matrix && 'Drop 2 files here...'}
@@ -119,8 +126,8 @@ class App extends React.PureComponent {
                 assume(result, 'A file could not be recognized!');
                 byType[result.type] = result.matrix;
             }
-            const matrix = computeFinalMatrix(byType.c, byType.i, replacements);
-            this.setState({matrix});
+            const {matrix, summary} = computeFinalMatrix(byType.c, byType.i, replacements);
+            this.setState({matrix, summary});
         } catch (error) {
             console.error(error);
             alert(error.message);
@@ -131,7 +138,7 @@ class App extends React.PureComponent {
         const {matrix} = this.state;
         const preparedMatrix = prepareMatrixForDownload(matrix);
         downloadMatrixAsXLSX(preparedMatrix);
-    }
+    };
 
 
 }
@@ -189,13 +196,48 @@ const parseReplacements = (textareaValue) => {
         if (sides.length !== 2) {
             continue;
         }
-        const left = sides[0].trim();
-        const right = sides[1].trim();
-        if (left && right) {
-            output.push({left, right});
+        const left = processPattern(sides[0]);
+        if (!left) {
+            continue;
         }
+        const right = sides[1]?.trim() || '';
+        output.push({left, right});
     }
     return output;
+};
+
+/**
+ * Converts a string that looks like a regular expression (e.g., "/pattern/flags")
+ * into a native JavaScript RegExp object.
+ */
+const processPattern = (text) => {
+    text = text.trim();
+
+    // Check if the string starts and ends with a slash
+    if (!text || typeof text !== 'string' || text.length < 2 || text[0] !== '/') {
+        return text;
+    }
+
+    // Find the index of the last slash
+    const lastSlashIndex = text.lastIndexOf('/');
+
+    // If there's no closing slash, or the closing slash is the first character (meaning just "/"), it's invalid
+    if (lastSlashIndex <= 0) {
+        return text;
+    }
+
+    // Extract the pattern and flags
+    // The pattern is everything between the first slash and the last slash
+    const pattern = text.substring(1, lastSlashIndex);
+    // The flags are everything after the last slash
+    const flags = text.substring(lastSlashIndex + 1);
+
+    try {
+        // Create and return the RegExp object
+        return new RegExp(pattern, flags);
+    } catch (e) {
+        return text;
+    }
 };
 
 /**
@@ -227,7 +269,7 @@ const prepareMatrixForDownload = (matrix) => {
         }
     }
     return fresh;
-}
+};
 
 
 /**
@@ -242,10 +284,10 @@ const downloadMatrixAsXLSX = (matrix, filename = 'result.xlsx') => {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
     // Step 3: Write the workbook to binary string
-    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const wbout = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
 
     // Step 4: Trigger download in browser
-    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const blob = new Blob([wbout], {type: 'application/octet-stream'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -254,7 +296,7 @@ const downloadMatrixAsXLSX = (matrix, filename = 'result.xlsx') => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-}
+};
 
 
 // =====================================================================================================================
