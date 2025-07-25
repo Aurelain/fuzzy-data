@@ -1,8 +1,8 @@
 import levenshtein from 'js-levenshtein';
 
 const cleanToOriginal = {};
-const NAME = 4;
-const TAG = 5;
+const TAG = 4;
+const NAME = 5;
 const DISTANCE = 6;
 const COMMENT = 7;
 const CANDIDATES = 8;
@@ -14,18 +14,13 @@ const CANDIDATES = 8;
  *
  */
 const computeFinalMatrix = (cMatrix, iMatrix, replacements) => {
-    // Swap tag with name
-    const cup = iMatrix[0][NAME];
-    iMatrix[0][NAME] = iMatrix[0][TAG];
-    iMatrix[0][TAG] = cup;
-    iMatrix[0].push('Distance', 'Comment', 'Candidates');
+    if (iMatrix[0].length < 7) {
+        iMatrix[0].push('Distance', 'Comment', 'Candidates');
+    }
 
-    // iMatrix = [iMatrix[0], iMatrix[2]];
-
-    // Remove headers
-    cMatrix.shift();
+    // Remove headers:
+    const cHeader = cMatrix.shift();
     const iHeader = iMatrix.shift();
-
 
     const iLen = iMatrix.length;
     const cUsed = {};
@@ -42,8 +37,8 @@ const computeFinalMatrix = (cMatrix, iMatrix, replacements) => {
         const {distance, name, tag} = first;
         const isDupe = name in cUsed;
         cUsed[name] = true;
-        iMatrix[i][NAME] = name;
         iMatrix[i][TAG] = tag;
+        iMatrix[i][NAME] = name;
         iMatrix[i][DISTANCE] = distance;
         if (isDupe) {
             iMatrix[i][COMMENT] = 'Dupe!';
@@ -57,6 +52,8 @@ const computeFinalMatrix = (cMatrix, iMatrix, replacements) => {
         }
     }
 
+    // Restore headers:
+    cMatrix.unshift(cHeader);
     iMatrix.unshift(iHeader);
 
     const summary = `<ul>

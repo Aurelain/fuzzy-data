@@ -119,9 +119,9 @@ class App extends React.PureComponent {
             matrix: []
         });
         try {
+            const replacements = parseReplacements(this.textareaRef.current.value);
             if (!cache) {
                 assume(xlsxFiles.length === 2, 'Please drop exactly 2 files!');
-                const replacements = parseReplacements(this.textareaRef.current.value);
                 const byType = {};
                 for (const file of xlsxFiles) {
                     const data = await getArrayBuffer(file);
@@ -130,9 +130,9 @@ class App extends React.PureComponent {
                     assume(result, 'A file could not be recognized!');
                     byType[result.type] = result.matrix;
                 }
-                cache = {c:byType.c, i:byType.i, replacements};
+                cache = {c:byType.c, i:byType.i};
             }
-            const {matrix, summary} = computeFinalMatrix(cache.c, cache.i, cache.replacements);
+            const {matrix, summary} = computeFinalMatrix(cache.c, cache.i, replacements);
             this.setState({matrix, summary});
         } catch (error) {
             console.error(error);
@@ -151,7 +151,8 @@ class App extends React.PureComponent {
     };
 
     onTestClick = () => {
-        const {matrix, summary} = testReplacements(cache.c, cache.i, cache.replacements);
+        const replacements = parseReplacements(this.textareaRef.current.value);
+        const {matrix, summary} = testReplacements(cache.c, cache.i, replacements);
         this.setState({matrix, summary});
     };
 

@@ -5,10 +5,6 @@
  *
  */
 const testReplacements = (cMatrix, iMatrix, replacements) => {
-    // Remove headers
-    cMatrix.shift();
-    iMatrix.shift();
-
     const output = [
         ['Nume original', 'Nume folosit la comparație'],
     ];
